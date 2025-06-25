@@ -7,6 +7,7 @@ from loguru import logger
 
 from ..config import settings
 from ..data_fetchers.coingecko import CoinGeckoFetcher
+from ..data_fetchers.hedera import hedera_token_fetcher
 
 # Global scheduler instance  
 scheduler: Optional[AsyncIOScheduler] = None
@@ -32,6 +33,26 @@ async def fetch_and_save_hbar_data():
         logger.error(f"Scheduled HBAR data fetch failed: {e}")
 
 
+async def fetch_and_save_token_data():
+    """Scheduled task to fetch and save Hedera token data."""
+    try:
+        logger.info("Starting scheduled token data fetch")
+        
+        async with hedera_token_fetcher:
+            tokens_data = await hedera_token_fetcher.fetch_data()
+            if tokens_data:
+                success = await hedera_token_fetcher.save_token_data(tokens_data)
+                if success:
+                    logger.info(f"Token data saved: {len(tokens_data)} tokens")
+                else:
+                    logger.error("Failed to save token data to database")
+            else:
+                logger.warning("No token data received from API")
+                
+    except Exception as e:
+        logger.error(f"Scheduled token data fetch failed: {e}")
+
+
 async def log_scheduler_status():
     """Scheduled task to log scheduler status."""
     logger.info(f"Scheduler status check - {datetime.utcnow()}")
@@ -53,6 +74,16 @@ async def start_schedulers():
         "interval",
         seconds=settings.updates.hbar_interval,
         id="hbar_data_fetch",
+        max_instances=1,
+        coalesce=True,
+    )
+    
+    # Add token data fetching job
+    scheduler.add_job(
+        fetch_and_save_token_data,
+        "interval",
+        seconds=settings.updates.tokens_interval,
+        id="token_data_fetch",
         max_instances=1,
         coalesce=True,
     )

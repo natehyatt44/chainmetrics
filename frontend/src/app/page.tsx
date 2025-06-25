@@ -5,6 +5,7 @@ import { SWRConfig } from 'swr';
 import { Header } from '@/components/layout/header';
 import { HBARMetrics } from '@/components/ui/hbar-metrics';
 import { NetworkStatus } from '@/components/ui/network-status';
+import { TokenChart } from '@/components/ui/token-chart';
 import { useCurrentHBARData, useMetricsSummary } from '@/hooks/useHBARData';
 
 export default function Home() {
@@ -41,6 +42,7 @@ export default function Home() {
 
           <div className="space-y-12">
             <HBARMetrics />
+            <TokenChart />
             <NetworkStatus />
           </div>
 

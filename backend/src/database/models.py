@@ -97,10 +97,9 @@ def create_tables(conn: duckdb.DuckDBPyConnection) -> None:
         )
     """)
     
-    # Hedera tokens table
+    # Hedera tokens table  
     conn.execute("""
         CREATE TABLE IF NOT EXISTS hedera_tokens (
-            id INTEGER PRIMARY KEY,
             timestamp TIMESTAMP NOT NULL,
             token_id VARCHAR NOT NULL,
             name VARCHAR NOT NULL,
@@ -108,7 +107,14 @@ def create_tables(conn: duckdb.DuckDBPyConnection) -> None:
             price_usd DOUBLE,
             market_cap DOUBLE,
             volume_24h DOUBLE,
-            price_change_24h DOUBLE
+            price_change_24h DOUBLE,
+            decimals INTEGER DEFAULT 0,
+            total_supply BIGINT DEFAULT 0,
+            holders_count INTEGER,
+            transfers_24h INTEGER,
+            token_type VARCHAR DEFAULT 'FUNGIBLE_COMMON',
+            memo VARCHAR DEFAULT '',
+            PRIMARY KEY (timestamp, token_id)
         )
     """)
     

@@ -63,6 +63,16 @@ class DatabaseManager:
         """Execute query and fetch one result."""
         result = self.execute(query, parameters)
         return result.fetchone()
+    
+    def execute_many(self, query: str, parameters_list: list) -> None:
+        """Execute a query with multiple parameter sets."""
+        conn = self.connect()
+        try:
+            conn.executemany(query, parameters_list)
+        except Exception as e:
+            logger.error(f"Batch query execution failed: {e}")
+            logger.error(f"Query: {query}")
+            raise
 
 
 # Global database manager instance
